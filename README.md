@@ -1,2 +1,3 @@
 # NT-Xent-from-scratch
-Simple NT-Xent loss built using basic Pytorch tensor infrastructure
+
+This Repo implements a simple contrastive learning architecture using NT-Xent, from scratch using Pytorch.
