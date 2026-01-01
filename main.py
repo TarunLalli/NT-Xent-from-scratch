@@ -19,13 +19,8 @@ class NTXent(nn.Module):
     
     def similarityMatrix(self,z):
         S = z @ z.T
-        rows = [row for row in range(2*self.B)]
-        cols = []
-        for row in rows:
-            if row <= (self.B-1):
-                cols.append(row+self.B)
-            elif row > (self.B-1):
-                cols.append(row-self.B)
+        rows = torch.arange(2*self.B, device = z.device)
+        cols = (rows + self.B) % 2*self.B
         positives = S[rows,cols]
         return S, positives
     
