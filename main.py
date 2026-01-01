@@ -10,6 +10,7 @@ class NTXent(nn.Module):
         self.B = z1.shape[0]
         z = torch.cat([self.l2norm(z1),self.l2norm(z2)],dim=0)
         S, positives = self.similarityMatrix(z)
+        S = self.masking(S)
         loss = self.lossCalc(S,positives)
 
     def l2norm(self, x):
