@@ -2,14 +2,15 @@ import torch
 import torch.nn as nn
 
 class NTXent(nn.Module):
-    def __init__(self):
+    def __init__(self, tau):
         super().__init__()
+        self.tau = tau
 
     def forward(self, z1, z2):
         self.B = z1.shape[0]
         z = torch.cat([self.l2norm(z1),self.l2norm(z2)],dim=0)
-        
         S, positives = self.similarityMatrix(z)
+        loss = self.lossCalc(S,positives)
 
     def l2norm(self, x):
         return torch.nn.functional.normalize(x, p=2, dim=1)
@@ -33,4 +34,11 @@ class NTXent(nn.Module):
         
         return S
 
-
+    def lossCalc(self,S,positives):
+        denominator =  torch.sum(torch.exp(S/self.tau),1)
+        numerator = torch.exp(positives/self.tau)
+        big_L = 0
+        for i in range(2*self.B):
+            big_L += -1 * torch.log((numerator[i])/(denominator[i]))
+        
+        return(big_L/2*self.B)
