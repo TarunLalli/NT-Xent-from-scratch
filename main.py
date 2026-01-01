@@ -37,5 +37,5 @@ class NTXent(nn.Module):
     def lossCalc(self,S,positives):
         denominator =  torch.sum(torch.exp(S/self.tau),1)
         numerator = torch.exp(positives/self.tau)
-        big_L = -1 * torch.log(torch.sum(numerator/denominator))
+        big_L = -1 * torch.sum(torch.log(numerator/denominator))
         return(big_L/(2*self.B))
