@@ -12,10 +12,11 @@ class NTXent(nn.Module):
         S, positives = self.similarityMatrix(z)
         S = self.masking(S)
         loss = self.lossCalc(S,positives)
+        return loss
 
     def l2norm(self, x):
         return torch.nn.functional.normalize(x, p=2, dim=1)
-
+    
     def similarityMatrix(self,z):
         S = z @ z.T
         rows = [row for row in range(2*self.B)]
@@ -26,20 +27,15 @@ class NTXent(nn.Module):
             elif row > (self.B-1):
                 cols.append(row-self.B)
         positives = S[rows,cols]
-
         return S, positives
     
     def masking(self, S):
         mask = torch.eye(2*self.B, dtype=torch.bool).to(S.device)
         S = S.masked_fill_(mask=mask, value=float('-inf'))
-        
         return S
 
     def lossCalc(self,S,positives):
         denominator =  torch.sum(torch.exp(S/self.tau),1)
         numerator = torch.exp(positives/self.tau)
-        big_L = 0
-        for i in range(2*self.B):
-            big_L += -1 * torch.log((numerator[i])/(denominator[i]))
-        
-        return(big_L/2*self.B)
+        big_L = -1 * torch.sum(numerator/denominator)
+        return(big_L/(2*self.B))
